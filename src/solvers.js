@@ -99,6 +99,10 @@ window.findNQueensSolution = function(n) {
 window.countNQueensSolutions = function(n) {
   var solutionCount = undefined; //fixme
 
+  //1st Queen can 'attack' vertical, horizontal '[row][col]'' square-spaces
+    //Cross-out these spaces
+    //For the 'next-Queen', 'concat' these additional spaces (see step 1) 
+
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
