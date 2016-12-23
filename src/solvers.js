@@ -75,34 +75,25 @@ window.countNRooksSolutions = function(n) {
 // return a matrix (an array of arrays) representing a single nxn chessboard, 
 // with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  //createBoard function
   var boardCreator = function(n) {
     var array = [];
     for (var i = 0; i < n; i++) {
       var subArray = [];
-      
       for (var j = 0; j < n; j++) {
         subArray.push(0);
       }
-
       array.push(subArray);
     }
     return array;
   };
-  //mutates values 'LEFT' and 'RIGHT' of placed Queen
-  var horizontalQueenify = function(x, y) {
-    // create a copy of x starting position for iterating backwards as well
+  var horizontalQ = function(x, y, board) {
     var otherX = x;
-    
-    // mutate all queen attack positions to the right of x-axis
     while (board[x][y]) {
       if (board[x][y] === 0) {
         board[x][y] = 'x';
       }
       x++;
     }
-
-    // mutate all queen attack positions to the left of y-axis
     while (board[y][otherX]) {
       if (board[y][otherX] === 0) {
         board[y][otherX] = 'x';
@@ -110,19 +101,14 @@ window.findNQueensSolution = function(n) {
       x--;
     }
   };
-  //mutates values 'Top' and 'Bottom' of placed Queen
-  var verticalQueenify = function(x, y) {
+  var verticalQ = function(x, y, board) {
     var otherY = y;
-
-    // mutate all queen attack positions to the top of y-axis
     while (board[x][y]) {
       if (board[x][y] === 0) {
         board[x][y] = 'x';
       }
       y++;
     }
-
-    // mutate all queen attack positions to the bottom of y-axis
     while (board[y][otherY]) {
       if (board[y][otherY] === 0) {
         board[y][otherY] = 'x';
@@ -130,9 +116,7 @@ window.findNQueensSolution = function(n) {
       y--;
     }
   };
-  //mutages values cross diagonally of placed Queen
-  var diagonalQueenify = function(x, y) {
-    // create starting x,y coordinate for each while loop (4 in total, including original arguments)
+  var diagonalQ = function(x, y, board) {
     var x1 = x;
     var y1 = y;
     var x2 = x;
@@ -140,7 +124,6 @@ window.findNQueensSolution = function(n) {
     var x3 = x;
     var y3 = y;
 
-    // mutate all queen attack positions to the top left (x--, y++) => using original x,y
     while (board[x][y]) {
       if (board[x][y] === 0) {
         board[x][y] = 'x';
@@ -148,8 +131,6 @@ window.findNQueensSolution = function(n) {
       x--;
       y++;
     }
-
-    // mutate all queen attack positions to the bottom right (x++, y++), using x1, y1 
     while (board[x1][y1]) {
       if (board[x1][y1] === 0) {
         board[x1][y1] = 'x';
@@ -157,8 +138,6 @@ window.findNQueensSolution = function(n) {
       x1++;
       y1++;
     }
-
-    // mutate all queen attack positions to the top right (x++, y--), using x2, y2
     while (board[x2][y2]) {
       if (board[x2][y2] === 0) {
         board[x2][y2] = 'x';
@@ -166,8 +145,6 @@ window.findNQueensSolution = function(n) {
       x2++;
       y2--;
     }
-
-    // mutate all queen attack positions to the bottom left (x--, y++), using x3, y3
     while (board[x3][y3]) {
       if (board[x3][y3] === 0) {
         board[x3][y3] = 'x';
@@ -176,77 +153,64 @@ window.findNQueensSolution = function(n) {
       y3++;
     }
   };
-  //calls all three [x,y] mutation methods
-  var queenify = function(x, y) {
-    horizontalQueenify(x, y);
-    verticalQueenify(x, y);
-    diagonalQueenify(x, y);
-  };
-
-  var correctSolution;
-  var queenifyBoard = function(startingX, startingY) {
-    // will queenify board for starting queen positions
-      // iterate over multidimensional board
-      // x,y coordinates correspond to i,j
-    var boardCopy = boardCreator(n);
-    for (var i = 0; i < boardCopy.length; i++) {
-      
-      for (var j = 0; j < boardCopy.length; j++) {
-        if (boardCopy[i][j] === 0) {
-          boardCopy[i][j] = 1;
-          queenify(i, j);
+  //boolean - if solution has 'n' queens placed on board on 'nxn' board
+  var nCheck = function(n) {
+    var count = 0;
+    for (var i = 0; i < board.length; i++) {
+      for (var j = 0; j < board[i].length; i++) {
+        if (board[i][j] === 1) {
+          count++;
         }
       }
     }
+    return count === n;
+  };
+  if (n === 0) {
+    return [];
+  } else if (n === 1) {
+    return [[1]];
+  } else if (n === 2) {
+    return;
+  } else if (n === 3) {
+    return; 
+  }
+  var solution;
+  var queenify = function(startingX, startingY) {
+    var board = boardCreator(n);
+    for (var i = 0; i < board.length; i++) {
+      for (var j = 0; j < board.length; j++) {
+        if (board[i][j] === 0) {
+          board[i][j] = 1;
+          horizontalQ(i, j, board);
+          verticalQ(i, j, board);
+          diagonalQ(i, j, board);
+        }
+      }
+    }
+    if (nCheck(board)) {
+      solution = board;
+    }
+    return nCheck(board) ? true : false;
+  };
 
-    // checks if solution is correct (n argument === number of queens)
-    var queenCheck = function() {
-      var count = 0;
-      for (var i = 0; i < boardCopy.length; i++) {
-        for (var j = 0; j < boardCopy.length; j++) {
-          if (boardCopy[i][j] === 1) {
-            count++;
+  var formatted;
+  for (var i = 0; i < n; i++) {
+    formatted = solution;
+    var queened = queenify(i, 0);
+
+    //solution found - iterate through board and replace 'x' spaces with 0
+    if (queened) {
+      for (var l = 0; l < formatted.length; l++) {
+        for (var m = 0; m < formatted[i].length; m++) {
+          if (solution[i][j] === 'x') {
+            solution[i][j] = 0;
           }
         }
       }
-      return count === n;
-    };
-
-    if (queenCheck(boardCopy)) { correctSolution = boardCopy; }
-    return queenCheck(boardCopy);
-  };
-
-  // create board
-  var board = boardCreator(n);
-
-  // create queen starting place coordinates
-  // will change these coordinates after each unsuccessful starting queen coordinates
-  var queenX = 0;
-  var queenY = 0;
-
-  var queenSolution = false;
-
-  while (!queenSolution) {
-    queenSolution = true;
-
-    if (!queenifyBoard(queenX, queenY)) {
-      queenSolution = false;
-      queenX++;
-
-      if (queenX === n) {
-        queenX = 0;
-        queenY++;
-      }
-
-    } 
-
-    return correctSolution;
+    }
   }
 
-  // console.log(board);
-
-  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(board));
-  // return board;
+  return !!formatted ? formated : 'no solution found';
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
