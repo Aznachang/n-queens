@@ -215,12 +215,25 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0; //fixme
+  var board = new Board({n : n});
 
-  //1st Queen can 'attack' vertical, horizontal '[row][col]'' square-spaces
-    //Cross-out these spaces
-    //For the 'next-Queen', 'concat' these additional spaces (see step 1) 
+  var loop = function(row) {
+    if (row === n) {
+      solutionCount++;
+      return;
+    }
+    //first place Queen at coord. (0,0)
+    for (var col = 0; col < n; col++) {
+      board.togglePiece(row,col);
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+      if(!board.hasAnyQueensConflicts()) {
+        loop(row + 1);
+      }
+      board.togglePiece(row, col);
+    }
+  }
+
+  loop(0); //initially start at column zero
   return solutionCount;
 };
